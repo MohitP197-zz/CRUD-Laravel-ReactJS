@@ -12,6 +12,10 @@ export default class App extends Component {
         this.handleChange = this.handleChange.bind(this);
         // bind handleSubmit method
         this.handleSubmit = this.handleSubmit.bind(this);
+        //binding render tasks method
+        this.renderTasks = this.renderTasks.bind(this);
+        //binding the delete method
+        this.handleDelete = this.handleDelete.bind(this);
     }
     // handle change
     handleChange(e) {
@@ -31,15 +35,59 @@ export default class App extends Component {
             })
             .then(response => {
                 console.log('from handle submit', response);
-                //set state
+                // set state
                 this.setState({
-                   tasks: [response.data, ...this.state.tasks]
+                    tasks: [response.data, ...this.state.tasks]
                 });
-                //then clear the value of textarea
+                // then clear the value of textarea
                 this.setState({
-                   name: ''
+                    name: ''
                 });
             });
+    }
+    // render tasks
+    renderTasks() {
+        return this.state.tasks.map(task => (
+            <div key={task.id} className="media">
+                <div className="media-body">
+                    <p>{task.name}{}
+                    <button onClick={() => this.handleDelete(task.id)}
+                            className="btn btn-sm btn-warning float-right"
+                            >
+                        Delete
+                    </button>
+                    </p>
+                </div>
+            </div>
+        ));
+    }
+
+    //get all tasks from backend
+    getTasks()
+    {
+        axios.get('/tasks').then((
+            response //console.log(responce.data.tasks)
+        ) =>
+            this.setState({
+                tasks: [...response.data.tasks]
+            })
+        );
+    }
+
+    //lifecycle method
+    componentWillMount()
+    {
+        this.getTasks();
+    }
+    //handles delete
+    handleDelete(id)
+    {
+        //removes frm local state
+        const isNotId = task => task.id !== id;
+        const updatedTasks = this.state.tasks.filter(isNotId);
+        this.setState({ tasks: updatedTasks });
+        // make delete request to the backend
+        axios.delete('/tasks/${id}');
     }
 
     render() {
@@ -66,6 +114,8 @@ export default class App extends Component {
                                         Create Task
                                     </button>
                                 </form>
+                                <br />
+                                {this.renderTasks()}
                             </div>
                         </div>
                     </div>

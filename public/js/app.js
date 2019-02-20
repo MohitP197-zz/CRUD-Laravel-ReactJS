@@ -61150,6 +61150,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -61187,7 +61195,11 @@ function (_Component) {
 
     _this.handleChange = _this.handleChange.bind(_assertThisInitialized(_this)); // bind handleSubmit method
 
-    _this.handleSubmit = _this.handleSubmit.bind(_assertThisInitialized(_this));
+    _this.handleSubmit = _this.handleSubmit.bind(_assertThisInitialized(_this)); //binding render tasks method
+
+    _this.renderTasks = _this.renderTasks.bind(_assertThisInitialized(_this)); //binding the delete method
+
+    _this.handleDelete = _this.handleDelete.bind(_assertThisInitialized(_this));
     return _this;
   } // handle change
 
@@ -61204,13 +61216,79 @@ function (_Component) {
   }, {
     key: "handleSubmit",
     value: function handleSubmit(e) {
+      var _this2 = this;
+
       // stop browser's default behaviour of reloading on form submit
       e.preventDefault();
       axios.post('/tasks', {
         name: this.state.name
       }).then(function (response) {
-        console.log('from handle submit', response);
+        console.log('from handle submit', response); // set state
+
+        _this2.setState({
+          tasks: [response.data].concat(_toConsumableArray(_this2.state.tasks))
+        }); // then clear the value of textarea
+
+
+        _this2.setState({
+          name: ''
+        });
       });
+    } // render tasks
+
+  }, {
+    key: "renderTasks",
+    value: function renderTasks() {
+      var _this3 = this;
+
+      return this.state.tasks.map(function (task) {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+          key: task.id,
+          className: "media"
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+          className: "media-body"
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, task.name, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+          onClick: function onClick() {
+            return _this3.handleDelete(task.id);
+          },
+          className: "btn btn-sm btn-warning float-right"
+        }, "Delete"))));
+      });
+    } //get all tasks from backend
+
+  }, {
+    key: "getTasks",
+    value: function getTasks() {
+      var _this4 = this;
+
+      axios.get('/tasks').then(function (response //console.log(responce.data.tasks)
+      ) {
+        return _this4.setState({
+          tasks: _toConsumableArray(response.data.tasks)
+        });
+      });
+    } //lifecycle method
+
+  }, {
+    key: "componentWillMount",
+    value: function componentWillMount() {
+      this.getTasks();
+    } //handles delete
+
+  }, {
+    key: "handleDelete",
+    value: function handleDelete(id) {
+      //removes frm local state
+      var isNotId = function isNotId(task) {
+        return task.id !== id;
+      };
+
+      var updatedTasks = this.state.tasks.filter(isNotId);
+      this.setState({
+        tasks: updatedTasks
+      }); // make delete request to the backend
+
+      axios.delete('/tasks/${id}');
     }
   }, {
     key: "render",
@@ -61242,7 +61320,7 @@ function (_Component) {
       })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         type: "submit",
         className: "btn btn-primary"
-      }, "Create Task")))))));
+      }, "Create Task")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), this.renderTasks())))));
     }
   }]);
 
