@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import { Link } from 'react-router-dom';
 
 export default class App extends Component {
     constructor(props) {
@@ -10,21 +11,18 @@ export default class App extends Component {
         };
         // bind
         this.handleChange = this.handleChange.bind(this);
-        // bind handleSubmit method
         this.handleSubmit = this.handleSubmit.bind(this);
-        //binding render tasks method
         this.renderTasks = this.renderTasks.bind(this);
-        //binding the delete method
         this.handleDelete = this.handleDelete.bind(this);
+        this.handleUpdate = this.handleUpdate.bind(this);
     }
     // handle change
     handleChange(e) {
         this.setState({
             name: e.target.value
         });
-        console.log('onChange', this.state.name);
+        // console.log('onChange', this.state.name);
     }
-
     // create handleSubmit method right after handleChange method
     handleSubmit(e) {
         // stop browser's default behaviour of reloading on form submit
@@ -50,44 +48,58 @@ export default class App extends Component {
         return this.state.tasks.map(task => (
             <div key={task.id} className="media">
                 <div className="media-body">
-                    <p>{task.name}{}
-                    <button onClick={() => this.handleDelete(task.id)}
-                            className="btn btn-sm btn-warning float-right"
-                            >
-                        Delete
-                    </button>
-                    </p>
+                    <div>
+                        {task.name}{' '}
+                        <span className="text-muted">
+                            {' '}
+                            <br />by {task.user.name} |{' '}
+                            {task.updated_at
+                                .split(' ')
+                                .slice(1)
+                                .join(' ')}
+                        </span>
+                        <div className="btn-group float-right">
+                            <Link className="btn btn-sm btn-success" to={`/${task.id}/edit`}>
+                                Edit
+                            </Link>
+                            <button onClick={() => this.handleDelete(task.id)} className="btn btn-sm btn-warning">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                    <hr />
                 </div>
             </div>
         ));
     }
-
-    //get all tasks from backend
-    getTasks()
-    {
+    // get all tasks from backend
+    getTasks() {
         axios.get('/tasks').then((
-            response //console.log(responce.data.tasks)
-        ) =>
-            this.setState({
-                tasks: [...response.data.tasks]
-            })
+            response // console.log(response.data.tasks)
+            ) =>
+                this.setState({
+                    tasks: [...response.data.tasks]
+                })
         );
     }
-
-    //lifecycle method
-    componentWillMount()
-    {
+    // lifecycle method
+    componentWillMount() {
         this.getTasks();
     }
-    //handles delete
-    handleDelete(id)
-    {
-        //removes frm local state
+    // handle delete
+    handleDelete(id) {
+        // remove from local state
         const isNotId = task => task.id !== id;
         const updatedTasks = this.state.tasks.filter(isNotId);
         this.setState({ tasks: updatedTasks });
         // make delete request to the backend
-        axios.delete('/tasks/${id}');
+        axios.delete(`/tasks/${id}`);
+    }
+    // handle update
+    handleUpdate(id) {
+        axios.put(`/tasks/${id}`).then(response => {
+            this.getTasks();
+        });
     }
 
     render() {
