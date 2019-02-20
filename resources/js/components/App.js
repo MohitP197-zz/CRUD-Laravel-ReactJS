@@ -14,7 +14,7 @@ export default class App extends Component {
     }
 
     //handle change
-    handleChnage(e)
+    handleChange(e)
     {
         this.setState({
            name: e.target.value
@@ -32,8 +32,11 @@ export default class App extends Component {
                                 <form>
                                     <div className="form-group">
                                         <textarea
+                                            onChange={this.handleChange}
+                                            value={this.state.name}
                                             className="form-control"
                                             rows="5"
+                                            maxLength="255"
                                             placeholder="Create a new task"
                                             required
                                         />
