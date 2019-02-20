@@ -31,6 +31,14 @@ export default class App extends Component {
             })
             .then(response => {
                 console.log('from handle submit', response);
+                //set state
+                this.setState({
+                   tasks: [response.data, ...this.state.tasks]
+                });
+                //then clear the value of textarea
+                this.setState({
+                   name: ''
+                });
             });
     }
 
