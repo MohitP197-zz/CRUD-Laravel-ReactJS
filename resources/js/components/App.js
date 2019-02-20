@@ -2,6 +2,25 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
 export default class App extends Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            name: '',
+            tasks: []
+        };
+
+        //bind
+        this.handleChange = this.handleChange.bind(this);
+    }
+
+    //handle change
+    handleChnage(e)
+    {
+        this.setState({
+           name: e.target.value
+        });
+        console.log('onChange',this.state.name);
+    }
     render() {
         return (
             <div className="container">
