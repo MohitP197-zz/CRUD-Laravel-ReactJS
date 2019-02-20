@@ -14,17 +14,18 @@ class TaskController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('Auth');
+        $this->middleware('auth');
     }
 
     public function index(Request $request, Task $task)
     {
-        //gets all the tasks based on current user id
+        // get all the tasks based on current user id
         $allTasks = $task->whereIn('user_id', $request->user())->with('user');
-        $tasks = $allTasks->orderBy('created_at','desc')->take(10)->get();
-
-        //return json response
-        return response()->json(['tasks' => $tasks]);
+        $tasks = $allTasks->orderBy('created_at', 'desc')->take(10)->get();
+        // return json response
+        return response()->json([
+            'tasks' => $tasks,
+        ]);
     }
 
     /**
@@ -40,16 +41,15 @@ class TaskController extends Controller
 
     public function store(Request $request)
     {
-        //validate
-        $this->validate($request,[
-           'name' => 'required|max:255'
+        // validate
+        $this->validate($request, [
+            'name' => 'required|max:255',
         ]);
-        //create a new task based on user tasks relationship
+        // create a new task based on user tasks relationship
         $task = $request->user()->tasks()->create([
-           'name' => $request->name,
+            'name' => $request->name,
         ]);
-
-        //returns tasks with the user objejct
+        // return task with user object
         return response()->json($task->with('user')->find($task->id));
 
     }

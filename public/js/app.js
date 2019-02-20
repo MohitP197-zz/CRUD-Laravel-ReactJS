@@ -61183,11 +61183,13 @@ function (_Component) {
     _this.state = {
       name: '',
       tasks: []
-    }; //bind
+    }; // bind
 
-    _this.handleChange = _this.handleChange.bind(_assertThisInitialized(_this));
+    _this.handleChange = _this.handleChange.bind(_assertThisInitialized(_this)); // bind handleSubmit method
+
+    _this.handleSubmit = _this.handleSubmit.bind(_assertThisInitialized(_this));
     return _this;
-  } //handle change
+  } // handle change
 
 
   _createClass(App, [{
@@ -61197,6 +61199,18 @@ function (_Component) {
         name: e.target.value
       });
       console.log('onChange', this.state.name);
+    } // create handleSubmit method right after handleChange method
+
+  }, {
+    key: "handleSubmit",
+    value: function handleSubmit(e) {
+      // stop browser's default behaviour of reloading on form submit
+      e.preventDefault();
+      axios.post('/tasks', {
+        name: this.state.name
+      }).then(function (response) {
+        console.log('from handle submit', response);
+      });
     }
   }, {
     key: "render",
@@ -61213,7 +61227,9 @@ function (_Component) {
         className: "card-header"
       }, "Create Task"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "card-body"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("form", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("form", {
+        onSubmit: this.handleSubmit
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "form-group"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("textarea", {
         onChange: this.handleChange,
@@ -61235,10 +61251,6 @@ function (_Component) {
 
 
 
-if (document.getElementById('example')) {
-  react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Example, null), document.getElementById('example'));
-}
-
 /***/ }),
 
 /***/ "./resources/js/index.js":
@@ -61256,8 +61268,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _components_App__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/App */ "./resources/js/components/App.js");
 
+ // import App component
 
-
+ // change the getElementId from example to app
+// render App component instead of Example
 
 if (document.getElementById('root')) {
   react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_App__WEBPACK_IMPORTED_MODULE_2__["default"], null), document.getElementById('root'));

@@ -2,25 +2,38 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
 export default class App extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             name: '',
             tasks: []
         };
-
-        //bind
+        // bind
         this.handleChange = this.handleChange.bind(this);
+        // bind handleSubmit method
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+    // handle change
+    handleChange(e) {
+        this.setState({
+            name: e.target.value
+        });
+        console.log('onChange', this.state.name);
     }
 
-    //handle change
-    handleChange(e)
-    {
-        this.setState({
-           name: e.target.value
-        });
-        console.log('onChange',this.state.name);
+    // create handleSubmit method right after handleChange method
+    handleSubmit(e) {
+        // stop browser's default behaviour of reloading on form submit
+        e.preventDefault();
+        axios
+            .post('/tasks', {
+                name: this.state.name
+            })
+            .then(response => {
+                console.log('from handle submit', response);
+            });
     }
+
     render() {
         return (
             <div className="container">
@@ -29,7 +42,7 @@ export default class App extends Component {
                         <div className="card">
                             <div className="card-header">Create Task</div>
                             <div className="card-body">
-                                <form>
+                                <form onSubmit={this.handleSubmit}>
                                     <div className="form-group">
                                         <textarea
                                             onChange={this.handleChange}
@@ -52,8 +65,4 @@ export default class App extends Component {
             </div>
         );
     }
-}
-
-if (document.getElementById('example')) {
-    ReactDOM.render(<Example />, document.getElementById('example'));
 }
