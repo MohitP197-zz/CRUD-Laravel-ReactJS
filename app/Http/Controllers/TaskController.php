@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Task;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -11,9 +12,19 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function __construct()
     {
-        //
+        $this->middleware('Auth');
+    }
+
+    public function index(Request $request, Task $task)
+    {
+        //gets all the tasks based on current user id
+        $allTasks = $task->whereIn('user_id', $request->user())->with('user');
+        $tasks = $allTasks->orderBy('created_at','desc')->take(10)->get();
+
+        //return json response
+        return response()->json(['tasks' => $tasks]);
     }
 
     /**
@@ -26,15 +37,21 @@ class TaskController extends Controller
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function store(Request $request)
     {
-        //
+        //validate
+        $this->validate($request,[
+           'name' => 'required|max:255'
+        ]);
+        //create a new task based on user tasks relationship
+        $task = $request->user()->tasks()->create([
+           'name' => $request->name,
+        ]);
+
+        //returns tasks with the user objejct
+        return response()->json($task->with('user')->find($task->id));
+
     }
 
     /**
